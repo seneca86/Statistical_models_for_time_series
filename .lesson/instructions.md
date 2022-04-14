@@ -30,9 +30,7 @@ Ordinary least squares linear regression can be applied to time series data prov
 
 If these assumptions hold, then ordinary least squares regression is an unbiased estimator of the coefficients given the inputs, even for time series data.
 
-## Statistical Methods Developed for Time Series
-
-### Autoregressive Models
+## Autoregressive Models
 
 The autoregressive (AR) model relies on the intuition that the past predicts the future and so posits a time series process in which the value at a point in time t is a function of the series’s values at earlier points in time.
 
@@ -191,3 +189,62 @@ Another test that is commonly performed is the __Ljung-Box__ test, an overall te
 * __H1__: The data does exhibit serial correlation.
 
 This test is commonly applied to AR (and more generally, ARIMA) models, and more specifically to the residuals from the model fit rather than to the model itself:
+
+```python
+sm.stats.acorr_ljungbox(results.resid, lags=[10], return_df=True)
+```
+
+We apply the __Ljung-Box__ test to our est.1 model to assess its goodness of fit. We cannot reject the null hypothesis that the data does not exhibit serial correlation. This is confirmation of what we just found by plotting the ACF of the residuals.
+
+### Forecasting with an AR(p) process
+
+We first explore the case of one time step ahead and then discuss how predicting multiple steps ahead differs from the further case. 
+
+From a coding perspective there is not much difference, although the underlying mathematics is more elaborate in the latter case.
+
+We continue working with the model from the demand data, with the lag – 1 coefficient constrained to 0 (fit as est.1 earlier).
+
+```python
+df.banking_orders_2.corr(results.fittedvalues)
+print(results.forecast())  # one-step ahead
+print(results.forecast(steps=2))
+```
+
+If we calculate the correlation between the predicted value and the actual value, we get 0.29. This is not bad in some contexts, but remember that sometimes differencing the data will remove what seemed like a strong relationship and replace it with one that is essentially random.
+
+Let’s imagine that we wanted to produce a two-step-ahead forecast instead of a one-step-ahead forecast. What we would do is first produce the one-step-ahead forecast, and then use this to furnish the  value we need to predict.
+
+We can use the ease of predicting many time steps into the future to generate many multi-step-ahead forecasts for different horizons.
+
+```python
+plt.plot(df.banking_orders_2, color="blue", label="actuals")
+plt.plot(
+    pd.concat([results.fittedvalues, results.forecast(steps=30)]),
+    color="red",
+    label="AR forecast",
+)
+plt.legend()
+plt.savefig(directory + "/AR_forecast")
+```
+
+```python
+plot_acf(df.banking_orders_2)
+```
+
+The main difference between the forecast and the data is that the forecast is less variable than the data. It may predict the direction of the future correctly, but not the scale of the change from one time period to another. This is not a problem per se but rather reflects the fact that forecasts are means of the predicted distributions and so necessarily will have lower variability than sampled data.
+
+Another important observation is that the variance of the prediction decreases with increasing forward horizon. The reason for this is that the further forward in time we go, the less the actual data matters. One way of putting this is that forecasts further out in time converge to being the unconditional prediction.
+
+## Moving Average Models
+
+### The model
+
+A moving average model can be expressed similarly to an autoregressive model except that the terms included in the linear equation refer to present and past error terms rather than present and past values of the process itself. So an MA model of order q is expressed as:
+
+
+![](assets/MA.png)
+
+MA models are by definition weakly stationary without the need to impose any constraints on their parameters. This is because the mean and variance of an MA process are both finite and invariant with time because the error terms are assumed to be iid with mean 0.
+
+### Selecting parameters for an MA(q) process
+
