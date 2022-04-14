@@ -85,7 +85,7 @@ with model.fix_params({"ar.L1": 0}):
 
 # %%
 plot_acf(results.resid)
-plt.savefig(directory + '/acf_residuals_AR_constrained')
+plt.savefig(directory + "/acf_residuals_AR_constrained")
 
 # %% p-value not zero: we cannot reject the H0 (H0=data does not exhibit serial correlation)
 sm.stats.acorr_ljungbox(results.resid, lags=[10], return_df=True)
@@ -194,8 +194,8 @@ results = model.fit(y)
 print(f"results.summary()")
 
 # %% VAR (not VARIMA)
-model = VAR(df[['banking_orders_2', 'banking_orders_3']])
-results = model.fit(4) # lag order is chosen based on information criterion
+model = VAR(df[["banking_orders_2", "banking_orders_3"]])
+results = model.fit(4)  # lag order is chosen based on information criterion
 print(results.summary())
 # %%
 plt.plot(df.banking_orders_2, color="blue", label="banking_orders_2")
@@ -205,7 +205,7 @@ plt.plot(
     label="VAR forecast",
 )
 plt.legend()
-plt.title('VAR_banking_orders_2')
+plt.title("VAR_banking_orders_2")
 plt.savefig(directory + "/VAR_forecast_banking_2")
 # %%
 plt.plot(df.banking_orders_3, color="blue", label="banking_orders_3")
@@ -215,7 +215,7 @@ plt.plot(
     label="VAR_banking_orders_3",
 )
 plt.legend()
-plt.title('VAR banking orders 3')
+plt.title("VAR banking orders 3")
 plt.savefig(directory + "/VAR_forecast_traffic_3")
 # %%
 plot_acf(results.resid.banking_orders_2, title=f"ACF {k} banking_orders_2 VAR")
